@@ -1,20 +1,19 @@
-// routes/categoriesRouter.js
+// routes/productRoutes.js
 const express = require('express');
 const router = express.Router();
 const categoryController = require('../controllers/categoryController');
+const uploadMiddleware = require('../middlewares/upload');
 
-// Route: GET /api/categories
 router.get('/', categoryController.getCategories);
 
-// Route: GET /api/categories/:id
 router.get('/:id', categoryController.getCategory);
 
-router.post('/', categoryController.createCategory);
+router.get('/images', categoryController. getImageUrls);
 
-// Route: PUT /api/categories/:id
-router.put('/:id',categoryController.updateCategory);
+router.post('/', uploadMiddleware.single('image'), categoryController.CreateCategory);
 
-// Route: DELETE /api/categories/:id
-router.delete('/:id',categoryController.deleteCategory);
+router.put('/:id',uploadMiddleware.single('image'), categoryController.updateCategory);
+
+router.delete('/:id', categoryController.deleteCategory);
 
 module.exports = router;

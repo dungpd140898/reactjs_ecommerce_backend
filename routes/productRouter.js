@@ -6,6 +6,7 @@ const uploadMiddleware = require('../middlewares/upload');
 
 // Route: GET /api/products
 router.get('/', productController.getProducts);
+router.get('/productsnew', productController.getProductsNew);
 
 // Route: GET /api/products/:id
 router.get('/:id', productController.getProduct);
@@ -16,7 +17,8 @@ router.post('/', uploadMiddleware.single('image'), productController.createProdu
 
 // Route: PUT /api/products/:id
 router.put('/:id',uploadMiddleware.single('image'), productController.updateProduct);
-
+router.get('/category/:categoryId', productController.getProductsByCategory);
+router.get('/count/:categoryId', productController.getProductsByCategory);
 // Route: DELETE /api/products/:id
 router.delete('/:id', productController.deleteProduct);
 

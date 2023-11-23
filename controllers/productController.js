@@ -41,7 +41,7 @@ const getProduct = asyncHandler(async (req, res) => {
 // CREATE a product
 const createProduct = asyncHandler(async (req, res) => {
     try {
-      const { name, quantity, price, priceOld } = req.body;
+      const { name, quantity, price, priceOld, discription, categoryId } = req.body;
       const imageUrl = req.file ? req.file.path : '';
   
       const product = new Product({
@@ -49,6 +49,8 @@ const createProduct = asyncHandler(async (req, res) => {
         quantity,
         price,
         priceOld,
+        discription,
+        categoryId,
         imageUrl, // Lưu đường dẫn hình ảnh vào trường "imageUrl"
       });
   
@@ -63,13 +65,13 @@ const createProduct = asyncHandler(async (req, res) => {
 // UPDATE a product
 const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, quantity, price, priceOld } = req.body;
+  const { name, quantity, price, priceOld, discription, categoryId } = req.body;
   const imageUrl = req.file ? req.file.path : ''; // Lấy đường dẫn ảnh từ request nếu có
 
   try {
     const product = await Product.findByIdAndUpdate(
       id,
-      { name, quantity, price, priceOld, imageUrl }, // Cập nhật thông tin sản phẩm bao gồm đường dẫn ảnh mới
+      { name, quantity, price, priceOld,discription, imageUrl, categoryId }, // Cập nhật thông tin sản phẩm bao gồm đường dẫn ảnh mới
       { new: true } // Trả về sản phẩm sau khi cập nhật
     );
 
@@ -96,6 +98,36 @@ const deleteProduct = asyncHandler(async (req, res) => {
   res.status(200).json(product);
 });
 
+const getProductsByCategory  = asyncHandler(async (req, res) => {
+  const { categoryId } = req.params;
+  const products = await Product.find({categoryId: categoryId});
+  res.status(200).json(products);
+
+  });
+
+const getProductsNew  = asyncHandler(async (req, res) => {
+  try {
+    const latestProducts = await Product.find().sort({ createdAt: -1 }).limit(4);
+    res.json(latestProducts);
+  } catch (error) {
+    console.error('Lỗi khi lấy sản phẩm:', error);
+    res.status(500).send('Lỗi server');
+  }
+});
+
+ const getCountProductByCate  = asyncHandler(async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    // Sử dụng aggregation để đếm số lượng sản phẩm cho mỗi loại
+    const count = await Product.countDocuments({ categoryId });
+
+    res.json({ count });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 module.exports = {
   getProducts,
   getProduct,
@@ -103,4 +135,8 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getImageUrls,
+  getProductsByCategory,
+  getProductsNew,
+  getCountProductByCate
+
 };
